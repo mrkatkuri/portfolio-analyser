@@ -40,3 +40,25 @@ def build_rebalance_preview(
             }
         )
     return preview
+
+
+def aggregate_position_values(positions: list[dict[str, str | float]]) -> dict[str, float]:
+    """Combine position values by normalized symbol across brokerage accounts.
+
+    A symbol may occur in multiple accounts or lots. The result should contain
+    the total base-currency value held for each symbol.
+    """
+    values = {}
+    for position in positions:
+        symbol = str(position["symbol"]).strip().upper()
+        values[symbol] = float(position["value"])
+    return values
+
+
+def top_holdings(current_values: dict[str, float], limit: int = 5) -> list[str]:
+    """Return up to limit symbols, ordered from largest holding value to smallest.
+
+    limit must be positive. Empty portfolios return an empty list.
+    """
+    ranked = sorted(current_values, key=current_values.get)
+    return ranked[:limit]
